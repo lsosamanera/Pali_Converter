@@ -15,17 +15,106 @@ textarea{width:100%;display:block;min-height:245px;resize:vertical;border:0;back
 @media(max-width:740px){.shell{width:calc(100% - 20px);padding-top:21px}header{align-items:flex-start;margin-bottom:17px}.workbench{grid-template-columns:1fr;padding:15px}.intro{padding:19px 17px 15px;align-items:flex-start;flex-direction:column;gap:8px}.actions{padding:0 15px 15px;display:grid;grid-template-columns:1fr 1fr}.actions .primary{grid-column:1/-1}textarea{min-height:185px}.pane-foot{font-size:.68rem}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
+<style>
+:root{color-scheme:dark;--bg:#071b16;--panel:#102b22;--line:#385947;--text:#f6f2e5;--muted:#adbdad;--gold:#d4b45d;--gold2:#f3dc91;--green:#83c49b;--shadow:0 28px 78px #020b08a8;--ambient-a:#26664a;--ambient-b:#254f3b;--ambient-c:#183b30;--surface:rgba(13,39,31,.91);--surface-soft:rgba(8,31,24,.72);--surface-input:rgba(5,28,21,.63);--button:#12372a;--button-hover:#194735;--gold-fill:#d9b956;--gold-ink:#172218;--particle-rgb:239,205,119;--edge-glow:rgba(220,188,95,.17)}
+:root[data-theme="light"]{color-scheme:light;--bg:#f2f2e8;--panel:#fffef8;--line:#d0d8ca;--text:#1b3025;--muted:#596c5f;--gold:#8a6b1d;--gold2:#705614;--green:#26704d;--shadow:0 24px 70px rgba(38,54,40,.14);--ambient-a:#d9e5c9;--ambient-b:#e5ddbd;--ambient-c:#cce1d4;--surface:rgba(255,254,248,.91);--surface-soft:rgba(246,248,239,.88);--surface-input:rgba(238,243,232,.9);--button:#edf2e8;--button-hover:#e2ecde;--gold-fill:#d1b25e;--gold-ink:#24311e;--particle-rgb:142,111,43;--edge-glow:rgba(150,120,47,.13)}
+body{position:relative;isolation:isolate;overflow-x:hidden;background:radial-gradient(ellipse at 14% 0%,var(--ambient-a) 0,transparent 38%),radial-gradient(ellipse at 100% 46%,var(--ambient-b) 0,transparent 35%),radial-gradient(ellipse at 6% 94%,var(--ambient-c) 0,transparent 30%),var(--bg);background-attachment:fixed;transition:background-color .3s,color .3s}
+#ambient-particles{position:fixed;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;opacity:.52}
+.shell{position:relative;z-index:1}
+.mark{border-radius:50%;box-shadow:0 0 0 5px var(--edge-glow),0 0 28px var(--edge-glow);font-size:24px}
+main{position:relative;border-color:color-mix(in srgb,var(--line) 82%,transparent);background:linear-gradient(145deg,var(--surface),color-mix(in srgb,var(--surface) 84%,var(--bg)));box-shadow:var(--shadow);backdrop-filter:blur(18px)}
+.intro{border-bottom-color:var(--line);background:linear-gradient(105deg,color-mix(in srgb,var(--gold) 6%,transparent),transparent 64%)}
+.direction-picker label{color:var(--gold2)}
+.direction-picker select{border-color:var(--line);background:var(--surface-soft);color:var(--text);box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.pane{border-color:var(--line);background:var(--surface-input);box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
+.pane-head{border-bottom-color:var(--line);background:color-mix(in srgb,var(--panel) 42%,transparent)}
+.pane-title{color:var(--text)}
+.tag,.pane-foot,footer{color:var(--muted)}
+textarea{color:var(--text);caret-color:var(--gold2)}
+textarea::placeholder{color:color-mix(in srgb,var(--muted) 72%,transparent)}
+.pane-foot{border-top-color:var(--line)}
+button:not(.primary){background:var(--button);box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+button:not(.primary):hover{background:var(--button-hover)}
+button:focus-visible,textarea:focus-visible,.direction-picker select:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.primary{border-color:color-mix(in srgb,var(--gold-fill) 76%,#fff);background:linear-gradient(135deg,#ead17a,var(--gold-fill) 65%,#b9923d);color:var(--gold-ink);box-shadow:0 7px 24px var(--edge-glow),inset 0 1px 0 rgba(255,255,255,.42)}
+.primary:hover{box-shadow:0 9px 28px var(--edge-glow),inset 0 1px 0 rgba(255,255,255,.5)}
+.quiet{background:var(--button)}
+.head-actions{flex-wrap:wrap;justify-content:flex-end}
+#theme-toggle{display:flex;align-items:center;gap:8px;min-height:42px}
+#theme-toggle [data-theme-icon]{color:var(--gold2);font-size:1.08rem;line-height:1}
+#output{font-size:1.18rem;line-height:1.95}
+footer{letter-spacing:.025em}
+@media(max-width:740px){header{flex-wrap:wrap;align-items:center}.head-actions{margin-left:auto}}
+@media(max-width:420px){.shell{width:calc(100% - 16px)}.head-actions{gap:6px}.head-actions button{padding:9px 10px;font-size:.8rem}.brand{gap:10px}.mark{width:42px;height:42px}}
+@media(prefers-reduced-motion:reduce){body{background-attachment:scroll}#ambient-particles{opacity:.34}}
+.language-picker{display:flex;align-items:center;gap:7px}.language-picker label{color:var(--muted);font-size:.72rem;font-weight:700}
+#ui-language{max-width:116px;min-height:42px;border:1px solid var(--line);border-radius:12px;background:var(--button);color:var(--text);padding:8px 10px;font:700 .82rem system-ui,"Noto Sans Myanmar","Myanmar Text",sans-serif}
+:root[lang="shn"] body,:root[lang="my"] body,:root[lang="shn"] button,:root[lang="my"] button,:root[lang="shn"] select,:root[lang="my"] select{font-family:"Noto Sans Myanmar","Myanmar Text",system-ui,sans-serif}
+</style>
 </head>
-<body><div class="shell">
-<header><div class="brand"><div class="mark" aria-hidden="true">☸</div><div><div class="eyebrow">Pāli text tools</div><h1>Pāli Converter</h1></div></div>
-<div class="head-actions"><button id="sfx" type="button" aria-pressed="true" title="Turn sound effects off">🔊 SFX On</button></div></header>
-<main><section class="intro"><div><h2>Convert your passage</h2><p>Choose a direction, then convert your Pāli text.</p></div><div class="direction-picker"><label for="direction">Conversion direction</label><select id="direction" aria-label="Conversion direction"><option value="roman-to-shan">Roman Pāli to Shan Pāli</option><option value="roman-to-burmese">Roman Pāli to Burmese Pāli</option><option value="shan-to-roman">Shan Pāli to Roman Pāli</option><option value="shan-to-burmese">Shan Pāli to Burmese Pāli</option><option value="burmese-to-roman">Burmese Pāli to Roman Pāli</option><option value="burmese-to-shan">Burmese Pāli to Shan Pāli</option></select></div></section>
+<body><canvas id="ambient-particles" aria-hidden="true"></canvas><div class="shell">
+<header><div class="brand"><div class="mark" aria-hidden="true">☸</div><div><div class="eyebrow" data-i18n="brand">Pāli text tools</div><h1 data-i18n="appName">Pāli Converter</h1></div></div>
+<div class="head-actions"><div class="language-picker"><label for="ui-language" data-i18n="languageLabel">Language</label><select id="ui-language" aria-label="Interface language"><option value="en">English</option><option value="shn">တႆး</option><option value="my">မြန်မာ</option></select></div><button id="theme-toggle" type="button" aria-label="Switch to light mode" aria-pressed="false" title="Switch to light mode"><span data-theme-icon aria-hidden="true">☼</span><span data-theme-label>Light mode</span></button><button id="sfx" type="button" aria-pressed="true" title="Turn sound effects off">🔊 SFX On</button></div></header>
+<main><section class="intro"><div><h2 data-i18n="heading">Convert your passage</h2><p data-i18n="subtitle">Choose a direction, then convert your Pāli text.</p></div><div class="direction-picker"><label for="direction" data-i18n="directionLabel">Conversion direction</label><select id="direction" aria-label="Conversion direction"><option value="roman-to-shan">Roman Pāli to Shan Pāli</option><option value="roman-to-burmese">Roman Pāli to Burmese Pāli</option><option value="shan-to-roman">Shan Pāli to Roman Pāli</option><option value="shan-to-burmese">Shan Pāli to Burmese Pāli</option><option value="burmese-to-roman">Burmese Pāli to Roman Pāli</option><option value="burmese-to-shan">Burmese Pāli to Shan Pāli</option></select></div></section>
 <section class="workbench" aria-label="Converter">
-<div class="pane"><div class="pane-head"><span class="pane-title" id="input-label">Roman Pāli input</span><span class="tag">Source text</span></div><textarea id="input" spellcheck="false" placeholder="Type or paste Roman Pāli here…" aria-label="Roman Pāli input"></textarea><div class="pane-foot"><span id="input-count">0 characters</span></div></div>
-<div class="pane"><div class="pane-head"><span class="pane-title" id="output-label">Shan Pāli result</span><span class="tag">Converted text</span></div><textarea id="output" readonly spellcheck="false" placeholder="Your Shan Pāli result will appear here…" aria-label="Shan Pāli result"></textarea><div class="pane-foot"><span id="output-count">0 characters</span></div></div>
+<div class="pane"><div class="pane-head"><span class="pane-title" id="input-label">Roman Pāli input</span><span class="tag" data-i18n="sourceText">Source text</span></div><textarea id="input" spellcheck="false" placeholder="Type or paste Roman Pāli here…" aria-label="Roman Pāli input"></textarea><div class="pane-foot"><span id="input-count">0 characters</span></div></div>
+<div class="pane"><div class="pane-head"><span class="pane-title" id="output-label">Shan Pāli result</span><span class="tag" data-i18n="convertedText">Converted text</span></div><textarea id="output" readonly spellcheck="false" placeholder="Your Shan Pāli result will appear here…" aria-label="Shan Pāli result"></textarea><div class="pane-foot"><span id="output-count">0 characters</span></div></div>
 </section>
-<div class="actions"><button id="convert" class="button primary" type="button">Convert text ✦</button><button id="paste" class="button quiet" type="button">Paste</button><button id="copy" class="button quiet" type="button">Copy result</button><button id="sample" class="button quiet" type="button">Load example</button><button id="clear" class="button quiet" type="button">Clear all</button></div>
-</main><footer>Green and gold edition · Sound effects can be switched off at any time</footer></div>
+<div class="actions"><button id="convert" class="button primary" type="button" data-i18n="convert">Convert text ✦</button><button id="paste" class="button quiet" type="button" data-i18n="paste">Paste</button><button id="copy" class="button quiet" type="button" data-i18n="copy">Copy result</button><button id="sample" class="button quiet" type="button" data-i18n="sample">Load example</button><button id="clear" class="button quiet" type="button" data-i18n="clear">Clear all</button></div>
+</main><footer>Website by Lashio Sāmaṇera.</footer></div>
+<script>
+(() => {
+ const root=document.documentElement,themeButton=document.getElementById("theme-toggle"),themeMeta=document.querySelector('meta[name="theme-color"]');
+ let savedTheme="dark";
+ try{savedTheme=localStorage.getItem("pali-converter-theme")||"dark";}catch{}
+ const setTheme=theme=>{
+  root.dataset.theme=theme;
+  const light=theme==="light";
+  themeButton.setAttribute("aria-pressed",String(light));
+  themeButton.setAttribute("aria-label",`Switch to ${light?"dark":"light"} mode`);
+  themeButton.title=`Switch to ${light?"dark":"light"} mode`;
+  themeButton.querySelector("[data-theme-icon]").textContent=light?"☾":"☼";
+  themeButton.querySelector("[data-theme-label]").textContent=light?"Dark mode":"Light mode";
+  themeMeta.content=light?"#f2f2e8":"#071b16";
+  try{localStorage.setItem("pali-converter-theme",theme);}catch{}
+  cancelAnimationFrame(frame);lastTime=0;drawParticles(performance.now());
+ };
+ themeButton.addEventListener("click",()=>setTheme(root.dataset.theme==="light"?"dark":"light"));
+
+ const canvas=document.getElementById("ambient-particles"),ctx=canvas.getContext("2d"),reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)");
+ if(!ctx)return;
+ let width=0,height=0,particles=[],frame=0,lastTime=0;
+ const resize=()=>{
+  cancelAnimationFrame(frame);lastTime=0;
+  const ratio=Math.min(window.devicePixelRatio||1,2);
+  width=window.innerWidth;height=window.innerHeight;
+  canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);
+  ctx.setTransform(ratio,0,0,ratio,0,0);
+  const count=Math.max(18,Math.min(52,Math.round(width*height/30000)));
+  particles=Array.from({length:count},()=>({x:Math.random()*width,y:Math.random()*height,r:.55+Math.random()*1.4,a:.12+Math.random()*.35,s:.003+Math.random()*.009,p:Math.random()*Math.PI*2}));
+  drawParticles(performance.now());
+ };
+ const drawParticles=now=>{
+  if(!ctx||!width||!height)return;
+  const delta=lastTime?Math.min(now-lastTime,40):16;lastTime=now;
+  ctx.clearRect(0,0,width,height);
+  const rgb=getComputedStyle(root).getPropertyValue("--particle-rgb").trim()||"239,205,119";
+  for(const dot of particles){
+   dot.y-=dot.s*delta;dot.x+=Math.sin(now*.00018+dot.p)*.035;
+   if(dot.y< -5){dot.y=height+5;dot.x=Math.random()*width;}
+   if(dot.x< -5)dot.x=width+5;else if(dot.x>width+5)dot.x=-5;
+   ctx.beginPath();ctx.fillStyle=`rgba(${rgb},${dot.a})`;ctx.shadowColor=`rgba(${rgb},${dot.a*.85})`;ctx.shadowBlur=dot.r*8;ctx.arc(dot.x,dot.y,dot.r,0,Math.PI*2);ctx.fill();
+  }
+  ctx.shadowBlur=0;
+  if(!reduceMotion.matches&&!document.hidden)frame=requestAnimationFrame(drawParticles);
+ };
+ window.addEventListener("resize",resize,{passive:true});
+ document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!reduceMotion.matches){cancelAnimationFrame(frame);frame=requestAnimationFrame(drawParticles);}});
+ reduceMotion.addEventListener?.("change",()=>{cancelAnimationFrame(frame);lastTime=0;drawParticles(performance.now());});
+ setTheme(savedTheme==="light"?"light":"dark");
+ resize();
+})();
+</script>
 <script>
 "use strict";
 const consonants=[["ṭh","ꩧ"],["ḍh","ꩩ"],["kh","ၶ"],["gh","ꧠ"],["ch","ꧡ"],["jh","ꧢ"],["ṅ","င"],["ñ","ၺ"],["ṭ","ꩦ"],["ḍ","ꩨ"],["ṇ","ꧣ"],["th","ထ"],["dh","ꩪ"],["ph","ၽ"],["bh","ꧤ"],["ḷ","ꩮ"],["k","ၵ"],["g","ၷ"],["c","ၸ"],["j","ꩡ"],["t","တ"],["d","ၻ"],["n","ၼ"],["p","ပ"],["b","ၿ"],["m","မ"],["y","ယ"],["r","ရ"],["l","လ"],["w","ဝ"],["v","ဝ"],["s","သ"],["h","ႁ"]];
@@ -85,7 +174,7 @@ const burmeseIndependent={"aṃ":"အံ","iṃ":"ဣံ","uṃ":"ဥံ","ā":"
 const burmeseSigns={"a":"","ā":"ာ","i":"ိ","ī":"ီ","u":"ု","ū":"ူ","e":"ေ","ē":"ေ","o":"ော"};
 const burmeseTallAaConsonants=new Set(["ခ","ဂ","င","ဒ","ဓ","ပ","ဝ"]);
 const burmeseTallAaOConsonants=new Set(["ခ","ဂ","င","ဒ","ဓ","ပ","ဝ"]);
-const burmeseReferences={"buddho":"ဗုဒ္ဓေါ","saṃghena":"သံဃေန"};
+const burmeseReferences={"buddho":"ဗုဒ္ဓေါ","saṃghena":"သံဃေန","bhikkhusaṅghena":"ဘိက္ခုသံဃေန"};
 const burmeseVowels=["ā","ī","ū","ē","a","i","u","e","o"];
 function matchBurmeseConsonant(s,i){for(const [roman,out] of burmeseConsonants)if(s.startsWith(roman,i))return{roman,out};return null;}
 function convertRomanToBurmeseWord(raw){
@@ -194,4 +283,65 @@ document.getElementById("paste").addEventListener("click",async()=>{try{const te
 sfxButton.addEventListener("click",()=>{soundEnabled=!soundEnabled;sfxButton.textContent=soundEnabled?"🔊 SFX On":"🔇 SFX Off";sfxButton.setAttribute("aria-pressed",String(soundEnabled));sfxButton.title=soundEnabled?"Turn sound effects off":"Turn sound effects on";if(soundEnabled)playTone(720,.08);});
 document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==="Enter")document.getElementById("convert").click();});
 updateDirectionLabels();syncCounts();
+</script>
+<script>
+(() => {
+ const root=document.documentElement,languageSelect=document.getElementById("ui-language"),direction=document.getElementById("direction");
+ const labels={
+  en:{brand:"Pāli text tools",appName:"Pāli Converter",heading:"Convert your passage",subtitle:"Choose a direction, then convert your Pāli text.",languageLabel:"Language",directionLabel:"Conversion direction",sourceText:"Source text",convertedText:"Converted text",convert:"Convert text ✦",paste:"Paste",copy:"Copy result",sample:"Load example",clear:"Clear all",inputSuffix:"input",outputSuffix:"result",inputPlaceholder:s=>`Type or paste ${s} here…`,outputPlaceholder:s=>`Your ${s} result will appear here…`,character:"character",characters:"characters",lightMode:"Light mode",darkMode:"Dark mode",switchToLight:"Switch to light mode",switchToDark:"Switch to dark mode",soundOn:"Sound On",soundOff:"Sound Off",turnSoundOn:"Turn sound effects on",turnSoundOff:"Turn sound effects off",inputAria:s=>`${s} `,outputAria:s=>`${s} `,sourceNames:{roman:"Roman Pāli",shan:"Shan Pāli",burmese:"Burmese Pāli"}},
+  shn:{brand:"ၶိူင်ႈၵမ်ႉၸွႆႈတႃႇ ပႃႇလိ",appName:"ၶိူင်ႈပိၼ်ႇ ပႃႇလိ",heading:"ပိၼ်ႇလိၵ်ႈပႃႇလိ",subtitle:"Choose a direction, then convert your Pāli text.",languageLabel:"ၽႃႇသႃႇ",directionLabel:"လိူၵ်ႈၽႃႇသႃႇ ဢၼ်ၶႂ်ႈပိၼ်ႇတီႈၼႆႈ",sourceText:"လိၵ်ႈဢၼ်တေပိၼ်ႇ",convertedText:"လိၵ်ႈဢၼ်ပိၼ်ႇယဝ်ႉ",convert:"ပိၼ်ႇလိၵ်ႈ ✦",paste:"Paste",copy:"ၵေႃႇပီႇ",sample:"တူၺ်းတူဝ်ယၢင်ႇ",clear:"မွတ်ႇ",inputSuffix:"",outputSuffix:"",inputPlaceholder:s=>`သႂ်ႇ ${s} တီႈၼႆႈ…`,outputPlaceholder:s=>`${s} ဢၼ်ပိၼ်ႇယဝ်ႉ တေၼႄတီႈၼႆႈ…`,character:"တူဝ်",characters:"တူဝ်",lightMode:"Light mode",darkMode:"Dark mode",switchToLight:"Switch to light mode",switchToDark:"Switch to dark mode",soundOn:"ၽုၺ်ႇသဵင်",soundOff:"ဢိုတ်းသဵင်",turnSoundOn:"ၽုၺ်ႇသဵင်",turnSoundOff:"ဢိုတ်းသဵင်",inputAria:s=>`${s} `,outputAria:s=>`${s} `,sourceNames:{roman:"ပႃႇလိ ရူဝ်ႇမၢၼ်ႇ",shan:"ပႃႇလိ တႆး",burmese:"ပႃႇလိ မၢၼ်ႈ"}},
+  my:{brand:"ပါဠိစာသား ကိရိယာများ",appName:"ပါဠိစာသားပြောင်းစက်",heading:"ပါဠိစာသားကို ပြောင်းပါ",subtitle:"Choose a direction, then convert your Pāli text.",languageLabel:"ဘာသာစကား",directionLabel:"ပြောင်းလဲမည့် ဘာသာရွေးပါ",sourceText:"ပြောင်းလဲမည့် စာသား",convertedText:"ပြောင်းလဲပြီး စာသား",convert:"ပြောင်းရန် ✦",paste:"ကူးထည့်ရန်",copy:"ကူးယူရန်",sample:"ဥပမာကြည့်ရန်",clear:"အားလုံးရှင်းရန်",inputSuffix:"",outputSuffix:"",inputPlaceholder:s=>`ဤနေရာတွင် ${s} ရိုက်ထည့်ပါ…`,outputPlaceholder:s=>`${s} ရလဒ်ကို ဤနေရာတွင် ပြပါမည်…`,character:"အက္ခရာ",characters:"အက္ခရာ",lightMode:"Light mode",darkMode:"Dark mode",switchToLight:"Switch to light mode",switchToDark:"Switch to dark mode",soundOn:"အသံဖွင့်ထားသည်",soundOff:"အသံပိတ်ထားသည်",turnSoundOn:"အသံဖွင့်ရန်",turnSoundOff:"အသံပိတ်ရန်",inputAria:s=>`${s} `,outputAria:s=>`${s} `,sourceNames:{roman:"ရိုမန် ပါဠိ",shan:"ရှမ်း ပါဠိ",burmese:"မြန်မာ ပါဠိ"}}
+ };
+ let active="en";
+ const applyLanguage=code=>{
+  active=labels[code]?code:"en";
+  const t=labels[active];
+  root.lang=active;
+  languageSelect.value=active;
+  languageSelect.setAttribute("aria-label",t.languageLabel);
+  document.querySelectorAll("[data-i18n]").forEach(el=>{const key=el.dataset.i18n;if(t[key])el.textContent=t[key];});
+  const [sourceKey,targetKey]=direction.value.split("-to-");
+  const names=t.sourceNames;
+  Array.from(direction.options).forEach(option=>{
+   const [from,to]=option.value.split("-to-");
+   option.textContent=active==="en"?`${names[from]} to ${names[to]}`:`${names[from]} → ${names[to]}`;
+  });
+  const source=names[sourceKey],target=names[targetKey],inputLabel=document.getElementById("input-label"),outputLabel=document.getElementById("output-label"),input=document.getElementById("input"),output=document.getElementById("output");
+  inputLabel.textContent=`${source} ${t.inputSuffix}`;
+  outputLabel.textContent=`${target} ${t.outputSuffix}`;
+  input.placeholder=t.inputPlaceholder(source);
+  output.placeholder=t.outputPlaceholder(target);
+  input.setAttribute("aria-label",t.inputAria(source));
+  output.setAttribute("aria-label",t.outputAria(target));
+  direction.setAttribute("aria-label",t.directionLabel);
+  document.querySelector('.workbench').setAttribute("aria-label",t.heading);
+  const themeButton=document.getElementById("theme-toggle"),isLight=root.dataset.theme==="light";
+  themeButton.querySelector("[data-theme-label]").textContent=isLight?t.darkMode:t.lightMode;
+  themeButton.setAttribute("aria-label",isLight?t.switchToDark:t.switchToLight);
+  themeButton.title=isLight?t.switchToDark:t.switchToLight;
+  const sfxButton=document.getElementById("sfx"),soundOn=sfxButton.getAttribute("aria-pressed")==="true";
+  sfxButton.textContent=`${soundOn?"🔊 ":"🔇 "}${soundOn?t.soundOn:t.soundOff}`;
+  sfxButton.title=soundOn?t.turnSoundOff:t.turnSoundOn;
+  updateCounts(t);
+ };
+ const updateCounts=t=>{
+  const locale=t||labels[active],inputLength=document.getElementById("input").value.length,outputLength=document.getElementById("output").value.length;
+  document.getElementById("input-count").textContent=`${inputLength} ${inputLength===1?locale.character:locale.characters}`;
+  document.getElementById("output-count").textContent=`${outputLength} ${outputLength===1?locale.character:locale.characters}`;
+ };
+ const originalSyncCounts=window.syncCounts;
+ if(typeof originalSyncCounts==="function")window.syncCounts=()=>{originalSyncCounts();updateCounts();};
+ let saved="en";
+ try{saved=localStorage.getItem("pali-converter-language")||"en";}catch{}
+ languageSelect.addEventListener("change",()=>{
+  applyLanguage(languageSelect.value);
+  try{localStorage.setItem("pali-converter-language",active);}catch{}
+ });
+ direction.addEventListener("change",()=>applyLanguage(active));
+ document.getElementById("theme-toggle").addEventListener("click",()=>applyLanguage(active));
+ document.getElementById("sfx").addEventListener("click",()=>applyLanguage(active));
+ document.getElementById("input").addEventListener("input",()=>updateCounts());
+ document.getElementById("output").addEventListener("input",()=>updateCounts());
+ applyLanguage(saved);
+})();
 </script></body></html>
