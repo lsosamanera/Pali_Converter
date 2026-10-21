@@ -138,12 +138,10 @@ function consonantVowelSign(s,i,v){
  if(!secondConsonant)return signs[v];
  if(v==="ā")return "ၢ";
  if(v==="o")return "ေၢ";
- const firstRoot=firstConsonant.roman.endsWith("h")?firstConsonant.roman.slice(0,-1):firstConsonant.roman;
- const secondRoot=secondConsonant.roman.endsWith("h")?secondConsonant.roman.slice(0,-1):secondConsonant.roman;
- if((v==="e"||v==="ē")&&firstRoot===secondRoot)return "ဵ";
+ if(v==="e"||v==="ē")return "ဵ";
  return signs[v];
 }
-function convertWord(raw){
+function convertWord(raw,phraseStart=false){
  const s=normalize(raw);if(references[s])return references[s];let out="",i=0;
  while(i<s.length){
   const independentMatch=["aṃ","iṃ","uṃ","ā","ī","ū","ē","a","i","u","e","o"].find(v=>s.startsWith(v,i));
@@ -157,7 +155,7 @@ function convertWord(raw){
    const next=matchConsonant(s,after);
    if(next){
     const afterPair=after+next.roman.length,tail=readMedials(s,afterPair);
-    out+=c.out+"်"+next.out+tail.out;i=tail.index;const v=matchVowel(s,i);if(v){out+=consonantVowelSign(s,i,v);i+=v.length;}continue;
+    const isPhraseInitialH=next.roman==="h"&&phraseStart&&i===0;out+=c.out+(next.roman==="h"&&!isPhraseInitialH?"်":"")+next.out+tail.out;i=tail.index;const v=matchVowel(s,i);if(v){out+=consonantVowelSign(s,i,v);i+=v.length;}continue;
    }
    out+=c.out;i=after;const v=matchVowel(s,i);if(v){out+=consonantVowelSign(s,i,v);i+=v.length;}continue;
   }
@@ -166,7 +164,7 @@ function convertWord(raw){
  }
  return out;
 }
-function convertRomanText(text){return text.replace(/[A-Za-zāīūēṅñṭḍṇḷṃĀĪŪĒṄÑṬḌṆḶ]+|[.,]/g,t=>t==="."?"။":t===","?"၊":convertWord(t));}
+function convertRomanText(text){let phraseStart=true;return text.replace(/[A-Za-zāīūēṅñṭḍṇḷṃĀĪŪĒṄÑṬḌṆḶ]+|[.,]/g,t=>{if(t==="."){phraseStart=true;return "။";}if(t===","){phraseStart=true;return "၊";}const converted=convertWord(t,phraseStart);phraseStart=false;return converted;});}
 // Burmese Pāli uses the Burmese letter forms from the Library of Congress Pāli table.
 // Conjuncts use Myanmar virama (္); r/y/v medials use ြ/ျ/ွ.
 const burmeseConsonants=[["ss","ဿ"],["mh","မှ"],["ṭh","ဌ"],["ḍh","ဎ"],["kh","ခ"],["gh","ဃ"],["ch","ဆ"],["jh","ဈ"],["ṅ","င"],["ññ","ည"],["ñ","ဉ"],["ṭ","ဋ"],["ḍ","ဍ"],["ṇ","ဏ"],["th","ထ"],["dh","ဓ"],["ph","ဖ"],["bh","ဘ"],["ḷ","ဠ"],["k","က"],["g","ဂ"],["c","စ"],["j","ဇ"],["t","တ"],["d","ဒ"],["n","န"],["p","ပ"],["b","ဗ"],["m","မ"],["y","ယ"],["r","ရ"],["l","လ"],["v","ဝ"],["w","ဝ"],["s","သ"],["h","ဟ"]];
