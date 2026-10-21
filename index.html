@@ -136,6 +136,7 @@ function consonantVowelSign(s,i,v){
  if(!firstConsonant)return signs[v];
  const secondConsonant=matchConsonant(s,afterVowel+firstConsonant.roman.length);
  if(!secondConsonant)return signs[v];
+ if((v==="e"||v==="ē")&&["r","y","v","w"].includes(secondConsonant.roman))return signs[v];
  if(v==="ā")return "ၢ";
  if(v==="o")return "ေၢ";
  if(v==="e"||v==="ē")return "ဵ";
@@ -155,7 +156,8 @@ function convertWord(raw,phraseStart=false){
    const next=matchConsonant(s,after);
    if(next){
     const afterPair=after+next.roman.length,tail=readMedials(s,afterPair);
-    const isPhraseInitialH=next.roman==="h"&&phraseStart&&i===0;out+=c.out+(next.roman==="h"&&!isPhraseInitialH?"်":"")+next.out+tail.out;i=tail.index;const v=matchVowel(s,i);if(v){out+=consonantVowelSign(s,i,v);i+=v.length;}continue;
+    // Add Shan asat to the first consonant in each pair, except phrase-initial pairs containing h.
+    const isPhraseInitialH=(c.roman==="h"||next.roman==="h")&&phraseStart&&i===0;out+=c.out+(!isPhraseInitialH?"်":"")+next.out+tail.out;i=tail.index;const v=matchVowel(s,i);if(v){out+=consonantVowelSign(s,i,v);i+=v.length;}continue;
    }
    out+=c.out;i=after;const v=matchVowel(s,i);if(v){out+=consonantVowelSign(s,i,v);i+=v.length;}continue;
   }
@@ -164,7 +166,7 @@ function convertWord(raw,phraseStart=false){
  }
  return out;
 }
-function convertRomanText(text){let phraseStart=true;return text.replace(/[A-Za-zāīūēṅñṭḍṇḷṃĀĪŪĒṄÑṬḌṆḶ]+|[.,]/g,t=>{if(t==="."){phraseStart=true;return "။";}if(t===","){phraseStart=true;return "၊";}const converted=convertWord(t,phraseStart);phraseStart=false;return converted;});}
+function convertRomanText(text){let phraseStart=true;return text.replace(/[A-Za-zāīūēṅñṭḍṇḷṃĀĪŪĒṄÑṬḌṆḶ]+|[.,!?;:။]|\r?\n/g,t=>{if(t==="."){phraseStart=true;return "။";}if(t===","){phraseStart=true;return "၊";}if(/[!?;:။\n]/.test(t)){phraseStart=true;return t;}const converted=convertWord(t,phraseStart);phraseStart=false;return converted;});}
 // Burmese Pāli uses the Burmese letter forms from the Library of Congress Pāli table.
 // Conjuncts use Myanmar virama (္); r/y/v medials use ြ/ျ/ွ.
 const burmeseConsonants=[["ss","ဿ"],["mh","မှ"],["ṭh","ဌ"],["ḍh","ဎ"],["kh","ခ"],["gh","ဃ"],["ch","ဆ"],["jh","ဈ"],["ṅ","င"],["ññ","ည"],["ñ","ဉ"],["ṭ","ဋ"],["ḍ","ဍ"],["ṇ","ဏ"],["th","ထ"],["dh","ဓ"],["ph","ဖ"],["bh","ဘ"],["ḷ","ဠ"],["k","က"],["g","ဂ"],["c","စ"],["j","ဇ"],["t","တ"],["d","ဒ"],["n","န"],["p","ပ"],["b","ဗ"],["m","မ"],["y","ယ"],["r","ရ"],["l","လ"],["v","ဝ"],["w","ဝ"],["s","သ"],["h","ဟ"]];
