@@ -187,7 +187,7 @@ function convertRomanToBurmeseWord(raw){
    const after=i+c.roman.length,medials=readMedials(s,after),next=matchBurmeseConsonant(s,medials.index);
    out+=c.out+medials.out;
    let vowelConsonant=c.out,vowelHasMedial=Boolean(medials.out);
-   if(next){const afterPair=medials.index+next.roman.length,tail=readMedials(s,afterPair);const isKinzi=c.roman==="ṅ"&&["k","kh","g","gh"].includes(next.roman);out+=(isKinzi?"်္":"္")+next.out+tail.out;i=tail.index;vowelConsonant=next.out;vowelHasMedial=Boolean(tail.out);}
+   if(next){const afterPair=medials.index+next.roman.length,tail=readMedials(s,afterPair);const isKinzi=c.roman==="ṅ"&&["k","kh","g","gh"].includes(next.roman);const isMedialHa=next.roman==="h";if(isMedialHa){out+="ှ"+tail.out;vowelConsonant=c.out;vowelHasMedial=true;}else{out+=(isKinzi?"်္":"္")+next.out+tail.out;vowelConsonant=next.out;vowelHasMedial=Boolean(tail.out);}i=tail.index;}
    else i=medials.index;
    const vowel=burmeseVowels.find(v=>s.startsWith(v,i));
    if(vowel){out+=!vowelHasMedial&&burmeseTallAaConsonants.has(vowelConsonant)&&vowel==="ā"?"ါ":!vowelHasMedial&&burmeseTallAaOConsonants.has(vowelConsonant)&&vowel==="o"?"ေါ":burmeseSigns[vowel];i+=vowel.length;}
