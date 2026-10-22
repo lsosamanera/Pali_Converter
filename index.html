@@ -142,7 +142,7 @@ function consonantVowelSign(s,i,v){
  if(v==="e"||v==="ē")return "ဵ";
  return signs[v];
 }
-function convertWord(raw,phraseStart=false){
+function convertWord(raw){
  const s=normalize(raw);if(references[s])return references[s];let out="",i=0;
  while(i<s.length){
   const independentMatch=["aṃ","iṃ","uṃ","ā","ī","ū","ē","a","i","u","e","o"].find(v=>s.startsWith(v,i));
@@ -156,8 +156,8 @@ function convertWord(raw,phraseStart=false){
    const next=matchConsonant(s,after);
    if(next){
     const afterPair=after+next.roman.length,tail=readMedials(s,afterPair);
-    // Add Shan asat to the first consonant in each pair, except phrase-initial pairs containing h.
-    const isPhraseInitialH=(c.roman==="h"||next.roman==="h")&&phraseStart&&i===0;out+=c.out+(!isPhraseInitialH?"်":"")+next.out+tail.out;i=tail.index;const v=matchVowel(s,i);if(v){out+=consonantVowelSign(s,i,v);i+=v.length;}continue;
+    // Use Shan asat for consonant pairs inside a word; word-initial pairs remain unmarked.
+    const isWordInitialPair=i===0;out+=c.out+(isWordInitialPair?"":"်")+next.out+tail.out;i=tail.index;const v=matchVowel(s,i);if(v){out+=consonantVowelSign(s,i,v);i+=v.length;}continue;
    }
    out+=c.out;i=after;const v=matchVowel(s,i);if(v){out+=consonantVowelSign(s,i,v);i+=v.length;}continue;
   }
@@ -166,7 +166,7 @@ function convertWord(raw,phraseStart=false){
  }
  return out;
 }
-function convertRomanText(text){let phraseStart=true;return text.replace(/[A-Za-zāīūēṅñṭḍṇḷṃĀĪŪĒṄÑṬḌṆḶ]+|[.,!?;:။]|\r?\n/g,t=>{if(t==="."){phraseStart=true;return "။";}if(t===","){phraseStart=true;return "၊";}if(/[!?;:။\n]/.test(t)){phraseStart=true;return t;}const converted=convertWord(t,phraseStart);phraseStart=false;return converted;});}
+function convertRomanText(text){return text.replace(/[A-Za-zāīūēṅñṭḍṇḷṃĀĪŪĒṄÑṬḌṆḶ]+|[.,!?;:။]|\r?\n/g,t=>{if(t===".")return "။";if(t===",")return "၊";if(/[!?;:။\n]/.test(t))return t;return convertWord(t);});}
 // Burmese Pāli uses the Burmese letter forms from the Library of Congress Pāli table.
 // Conjuncts use Myanmar virama (္); r/y/v medials use ြ/ျ/ွ.
 const burmeseConsonants=[["ss","ဿ"],["mh","မှ"],["ṭh","ဌ"],["ḍh","ဎ"],["kh","ခ"],["gh","ဃ"],["ch","ဆ"],["jh","ဈ"],["ṅ","င"],["ññ","ည"],["ñ","ဉ"],["ṭ","ဋ"],["ḍ","ဍ"],["ṇ","ဏ"],["th","ထ"],["dh","ဓ"],["ph","ဖ"],["bh","ဘ"],["ḷ","ဠ"],["k","က"],["g","ဂ"],["c","စ"],["j","ဇ"],["t","တ"],["d","ဒ"],["n","န"],["p","ပ"],["b","ဗ"],["m","မ"],["y","ယ"],["r","ရ"],["l","လ"],["v","ဝ"],["w","ဝ"],["s","သ"],["h","ဟ"]];
@@ -241,7 +241,7 @@ const independentReverse=[["ဢိံ","iṃ"],["ဢုံ","uṃ"],["ဢံ","a
 const reverseVowels=[["ေၢ","o"],["ေႃ","o"],["ဵ","e"],["ႃ","ā"],["ၢ","ā"],["ိ","i"],["ီ","ī"],["ု","u"],["ူ","ū"],["ေ","e"]];
 function matchShanConsonant(s,i){for(const c of reverseConsonants)if(s.startsWith(c.script,i))return c;return null;}
 function matchShanVowel(s,i){for(const [script,roman] of reverseVowels)if(s.startsWith(script,i))return{script,roman};return null;}
-function convertShanWord(raw){
+function convertShanWord(raw,forBurmese=false){
  const s=raw.normalize("NFC");if(shanReferences[s])return shanReferences[s];let out="",i=0;
  while(i<s.length){
   const independent=independentReverse.find(([script])=>s.startsWith(script,i));
@@ -251,6 +251,7 @@ function convertShanWord(raw){
    out+=c.roman;i+=c.script.length;
    while(i<s.length){const m=s[i];if(m==="ြ"){out+="r";i++;}else if(m==="ျ"){out+="y";i++;}else if(m==="ွ"){out+="v";i++;}else break;}
    if(s.startsWith("်",i)){i++;continue;}
+   if(forBurmese){const h=matchShanConsonant(s,i);if(h&&h.roman==="h"){out+="h";i+=h.script.length;}}
    const vowel=matchShanVowel(s,i);
    if(vowel){out+=vowel.roman;i+=vowel.script.length;}else out+="a";
    if(s.startsWith("ံ",i)){out+="ṃ";i++;}
@@ -261,11 +262,11 @@ function convertShanWord(raw){
  }
  return out;
 }
-function convertShanText(text){
- const roman=text.replace(/[\u1000-\u109F\uA980-\uA9FF\uAA60-\uAA7F]+|[၊။]/g,t=>t==="။"?".":t==="၊"?",":convertShanWord(t));
+function convertShanText(text,forBurmese=false){
+ const roman=text.replace(/[\u1000-\u109F\uA980-\uA9FF\uAA60-\uAA7F]+|[၊။]/g,t=>t==="။"?".":t==="၊"?",":convertShanWord(t,forBurmese));
  return roman.replace(/(^|[.!?]\s+)([a-zāīūēṅñṭḍṇḷṃ])/g,(m,prefix,letter)=>prefix+letter.toUpperCase());
 }
-function convertText(text){const [source,target]=direction.value.split("-to-");if(source==="roman"&&target==="shan")return convertRomanText(text);if(source==="roman"&&target==="burmese")return convertRomanToBurmeseText(text);if(source==="shan"&&target==="roman")return convertShanText(text);if(source==="burmese"&&target==="roman")return convertBurmeseText(text);if(source==="shan"&&target==="burmese")return convertRomanToBurmeseText(convertShanText(text));if(source==="burmese"&&target==="shan")return convertRomanText(convertBurmeseText(text));return text;}
+function convertText(text){const [source,target]=direction.value.split("-to-");if(source==="roman"&&target==="shan")return convertRomanText(text);if(source==="roman"&&target==="burmese")return convertRomanToBurmeseText(text);if(source==="shan"&&target==="roman")return convertShanText(text);if(source==="burmese"&&target==="roman")return convertBurmeseText(text);if(source==="shan"&&target==="burmese")return convertRomanToBurmeseText(convertShanText(text,true));if(source==="burmese"&&target==="shan")return convertRomanText(convertBurmeseText(text));return text;}
 const input=document.getElementById("input"),output=document.getElementById("output"),direction=document.getElementById("direction");
 const inputCount=document.getElementById("input-count"),outputCount=document.getElementById("output-count"),sfxButton=document.getElementById("sfx");
 let soundEnabled=true,audioContext=null;
